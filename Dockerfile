@@ -3,17 +3,10 @@
 FROM python:3.7.12-slim-buster
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      bzip2 \
-      g++ \
-      git \
-      graphviz \
-      libgl1-mesa-glx \
-      libhdf5-dev \
-      openmpi-bin \
-      wget \
-      python3-tk && \
-    rm -rf /var/lib/apt/lists/*
+     libglib2.0-0 libsm6 libxrender1 libxext6 && \
+     rm -rf /var/lib/apt/lists/*
 
+RUN mkdir /calibration
 WORKDIR /calibration
 
 COPY requirements.txt requirements.txt
@@ -29,5 +22,3 @@ RUN (apt-get autoremove -y; \
 ENV QT_X11_NO_MITSHM=1
 
 CMD ["bash"]
-
-# CMD ["python3", "--image_dir ./demo", "--image_format jpeg", "--prefix M30_", "--square_size 0.025", "--width 9", "--height 6", "--save_file M30_calibration.yml"]
