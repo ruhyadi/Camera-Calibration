@@ -132,6 +132,3 @@ dmypy.json
 # Folder
 /cleanup
 /data
-
-# file
-*.yml

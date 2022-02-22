@@ -21,7 +21,7 @@ python get_images.py ./data 0 images_webcam
 ```
 
 ### Calibrating Camera
-In order to calibrate camera, change parameters if needed and run:
+The purpose of camera calibration is to generate an intrinsic matrix (K). The program below will take the input image and generate a calibration matrix in `yml` file.
 ```
 python mono_calibration.py \
     --image_dir ./demo \
@@ -32,6 +32,46 @@ python mono_calibration.py \
     --height 6 \
     --save_file M30_calibration.yml
 ```
+```
+usage: mono_calibration.py [-h] --image_dir IMAGE_DIR --image_format
+                           IMAGE_FORMAT --prefix PREFIX
+                           [--square_size SQUARE_SIZE] [--width WIDTH]
+                           [--height HEIGHT] --save_file SAVE_FILE
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --image_dir IMAGE_DIR
+                        image directory path
+  --image_format IMAGE_FORMAT
+                        image format, png/jpg
+  --prefix PREFIX       image prefix
+  --square_size SQUARE_SIZE
+                        chessboard square size
+  --width WIDTH         chessboard width size, default is 9
+  --height HEIGHT       chessboard height size, default is 6
+  --save_file SAVE_FILE
+                        YML file to save calibration matrices
+```
+The calibration file `yml` contains an intrinsic matrix (K) and a distortion matrix (D). As below:
+```
+%YAML:1.0
+---
+K: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 8.2074718315015139e+02, 0., 5.2705661714841142e+02, 0.,
+       8.2003814588104046e+02, 2.3642917366196548e+02, 0., 0., 1. ]
+D: !!opencv-matrix
+   rows: 1
+   cols: 5
+   dt: d
+   data: [ 3.0124329351197032e-01, -1.7139992852268171e+00,
+       2.5721068961795258e-03, 2.7230187591786039e-03,
+       4.5098343258595559e+00 ]
+```
+
+
 
 ### With Docker
 You can also run programs using docker. Follow the commands below.
