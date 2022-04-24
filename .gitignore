@@ -133,3 +133,5 @@ dmypy.json
 /cleanup
 /data
 /demo/undist01
+/old
+*.txt
