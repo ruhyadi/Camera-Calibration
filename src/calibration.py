@@ -1,17 +1,19 @@
 import cv2
 import numpy as np
-from utils import save_coefficients, save_kitti
+from utils import save_opencv, save_kitti
 
 import argparse
 import os
+from tqdm import tqdm
 
 def calibrate_mono(
-    images_dir: str, 
+    image_dir: str, 
     columns: int, 
     rows: int, 
     square_size: int, 
     save_type: str, 
-    output: str
+    output: str,
+    viz: bool
     ):
     """
     Calibrate monocular camera
@@ -23,9 +25,12 @@ def calibrate_mono(
         save_type: type of mtx file (opencv, kitti)
         output: output name
     """
+
+    _save_type = ['opencv', 'kitti']
+    assert save_type in _save_type, "Save Type shoud be ['opencv', 'kitti']"
     
     # get images
-    imgs = os.listdir(images_dir)
+    imgs = os.listdir(image_dir)
 
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(8,6,0)
     objp = np.zeros((columns*rows, 3), np.float32)
@@ -40,9 +45,9 @@ def calibrate_mono(
     # termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-    for fname in imgs:
+    for fname in tqdm(imgs, desc='Processing Image'):
         # read image in grayscale
-        img = cv2.imread(os.path.join(images_dir, fname), cv2.IMREAD_COLOR)
+        img = cv2.imread(os.path.join(image_dir, fname), cv2.IMREAD_COLOR)
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
         # find chessboard pattern
@@ -63,15 +68,16 @@ def calibrate_mono(
             # draw corners on image
             img_draw = cv2.drawChessboardCorners(img, (columns, rows), corners2, ret)
 
-        cv2.imshow('Monocular Calibration', img)
-        cv2.waitKey(500)
+        if viz:
+            cv2.imshow('Monocular Calibration', img)
+            cv2.waitKey(500)
 
     # store matrix
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(OBJPOINTS, IMGPOINTS, gray.shape[::-1], None, None)
     
     # save matrix in file
     if save_type=='opencv':
-        save_coefficients(mtx, dist, output)
+        save_opencv(mtx, dist, output)
     elif save_type=='kitti':
         save_kitti(mtx, dist, output)
     else:
@@ -80,19 +86,21 @@ def calibrate_mono(
 if __name__ == '__main__':
     # Check the help parameters to understand arguments
     parser = argparse.ArgumentParser(description='Camera calibration')
-    parser.add_argument('--images_dir', type=str, help='image directory path')
+    parser.add_argument('--image_dir', type=str, help='image directory path')
     parser.add_argument('--square_size', type=float, help='chessboard square size')
     parser.add_argument('--columns', type=int, help='chessboard width size, default is 9')
     parser.add_argument('--rows', type=int, help='chessboard height size, default is 6')
     parser.add_argument('--save_type', type=str, help='Type of save file format [yaml, kitti(txt)]')
     parser.add_argument('--output', type=str, help='Output file name with format')
+    parser.add_argument('--viz', action='store_true', help='Visualize process')
 
     args = parser.parse_args()
 
     res = calibrate_mono(
-        args.images_dir,
+        args.image_dir,
         args.columns,
         args.rows,
         args.square_size,
         args.save_type,
-        args.output)
+        args.output,
+        args.viz)

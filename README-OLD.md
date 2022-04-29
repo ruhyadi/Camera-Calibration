@@ -15,9 +15,9 @@ pip install -r requirments.txt
 ### Get Image form Webcam
 The code below can be run to take pictures via webcam. Press `s` to save the image and `q` to end the program.
 ```
-python src/get_images.py \
-    --webcam 0 \
-    --output ./demo
+python src/get_images.py ./directory_to_save start_index prefix
+
+python src/get_images.py ./data 0 images_webcam
 ```
 
 ### Calibrating Camera
@@ -25,11 +25,12 @@ The purpose of camera calibration is to generate an intrinsic matrix (K). The pr
 ```
 python src/calibration.py \
     --image_dir ./demo/data01 \
+    --image_format png \
+    --prefix img \
     --square_size 0.025 \
-    --columns 9 \
-    --rows 6 \
-    --save_type kitti \
-    --output ./demo/calibration.txt
+    --width 9 \
+    --height 6 \
+    --save_file ./demo/calib_data01.yml
 ```
 ```
 usage: src/calibration.py [-h] --image_dir IMAGE_DIR --image_format
